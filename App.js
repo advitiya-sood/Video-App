@@ -15,7 +15,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
-  
+  //Email Updated
 
   const Stack = createNativeStackNavigator();
 
