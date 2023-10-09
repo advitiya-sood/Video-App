@@ -23,8 +23,8 @@ function App() {
     <StateProvider  >
         <StatusBar barStyle={"light-content"}/> 
         <View style={styles.sectionContainer}>
-        <NavigationContainer  >
-          <Stack.Navigator  >
+        <NavigationContainer>
+          <Stack.Navigator >
             <Stack.Group screenOptions={{headerShown:false}} >
               <Stack.Screen name="ContactScreen" component={ContactScreen}  />
               <Stack.Screen name="CallScreen" component={CallScreen} />
