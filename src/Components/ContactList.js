@@ -1,17 +1,17 @@
-import { View, Text, ScrollView, FlatList, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, FlatList, StyleSheet, Pressable } from 'react-native'
 import React, { useContext } from 'react'
 
 
-const ContactList = ({contacts}) => {
+const ContactList = ({contacts,handlePress}) => {
 
 
 
   return (
       <FlatList data={contacts} renderItem={(data)=>(
-        <View style={Styles.ListStyle} >
+        <Pressable onPress={handlePress.bind(this,data.item)} style={Styles.ListStyle} >
          <Text style={Styles.Text} >{data.item.user_display_name}</Text>
          <View style={Styles.Divider} />
-        </View>
+        </Pressable>
 
   )}  />
 

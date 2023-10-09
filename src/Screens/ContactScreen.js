@@ -1,20 +1,25 @@
-import { StyleSheet, TextInput, View,  } from 'react-native'
+import { StyleSheet, Text, TextInput, View,  } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import ContactList from '../Components/ContactList'
 import dataContext from '../../Context/dataContext'
 
-const ContactScreen = () => {
+const ContactScreen = ({navigation}) => {
     const {contacts}=useContext(dataContext);
     const [search,setSearch]=useState('')
 
     const[mainContacts,setMainContacts]=useState(contacts)
 
-    const   handleSearch=()=>{
+    const handleSearch=()=>{
         let filtered=contacts.filter((item)=>{
         if( item.user_display_name[0]?.toLowerCase()==search[0]?.toLowerCase() && (item.user_display_name.toLowerCase().includes(search.toLowerCase()) )){
             return true
         }})
         setMainContacts(filtered);
+    }
+
+    const handlePress =(item)=>{
+        navigation.navigate("CallingScreen",{user:item})
+
     }
 
 
@@ -23,9 +28,15 @@ const ContactScreen = () => {
     },[search])
 
   return (
-    <View>
+    <View style={{paddingHorizontal:4}}>
+        <View style={Styles.ContactHeader}>
+            <Text style={{color:"#3498DB",fontWeight:"500",fontSize:16}}>Groups</Text>
+            <Text style={{fontWeight:"500",fontSize:16}}>Contacts</Text>
+            <Text style={{color:"#3498DB",fontWeight:"500",fontSize:16}}>Add</Text>
+
+        </View>
         <TextInput value={search} onChangeText={(value)=>{setSearch(value)}}  placeholder='Search...' style={Styles.Search} />
-      <ContactList contacts={search.length>0? mainContacts :contacts }/>
+      <ContactList  handlePress={handlePress} contacts={search.length>0? mainContacts :contacts }/>
     </View>
   )
 }
@@ -40,7 +51,14 @@ const Styles=StyleSheet.create({
         borderColor:"grey",
         borderWidth:1
 
-    }
+    },
+    ContactHeader:{
+        height:40,
+        marginBottom:10,
+        flexDirection:"row",
+        justifyContent:"space-between",
+        alignItems:"center"
+    },
 })
 
 
