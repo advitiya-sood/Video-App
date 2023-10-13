@@ -10,6 +10,7 @@ import IncomingCall from './src/Screens/IncomingCall';
 import CallScreen from './src/Screens/CallScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Login from './src/Screens/LogIn';
 
 
 
@@ -26,6 +27,7 @@ function App() {
         <NavigationContainer>
           <Stack.Navigator >
             <Stack.Group screenOptions={{headerShown:false}} >
+            <Stack.Screen name="LogIn" component={Login}  />
               <Stack.Screen name="ContactScreen" component={ContactScreen}  />
               <Stack.Screen name="CallScreen" component={CallScreen} />
               <Stack.Screen name="IncomingCall" component={IncomingCall} />
@@ -45,7 +47,7 @@ function App() {
 const styles = StyleSheet.create({
   sectionContainer: {
     flex:1,
-    marginTop: 22,
+    marginTop: 8,
     paddingHorizontal: 8,
   }
 });

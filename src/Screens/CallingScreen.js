@@ -11,7 +11,7 @@ const handlePress=()=>{
     navigation.goBack()
 }
 const route=useRoute()
-const displayName=route.params.user.user_display_name
+const displayName=route.params?.user.user_display_name
 
 
   return (
