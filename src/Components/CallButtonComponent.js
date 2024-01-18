@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
 
-const CallButtonComponent = () => {
+const CallButtonComponent = ({handleOnTerminate}) => {
 
     const [icons,setIcons]=useState({
         mic:true,
@@ -12,7 +12,7 @@ const CallButtonComponent = () => {
     })
 
 const handleCameraReverse=()=>{
-
+    
 }
 
 const handleMic=()=>{
@@ -23,7 +23,7 @@ const handleMic=()=>{
 }
 
 const handleCallOff=()=>{
-   
+    handleOnTerminate()
 }
 
 const handleCameraOff=()=>{

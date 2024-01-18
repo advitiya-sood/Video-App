@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useContext } from 'react';
 import { ScrollView } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native';
 import { View, Text, Alert,StyleSheet } from 'react-native';
 import { Input, Button } from 'react-native-elements';
 import {Voximplant} from 'react-native-voximplant';
+import dataContext from '../../Context/dataContext';
 
 
 
@@ -12,6 +13,7 @@ export default function Login({navigation}) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errors,setErrors]=useState({})
+    const {contacts,setContacts}=useContext(dataContext);
 
     const Vox=Voximplant.getInstance();
     
@@ -19,30 +21,32 @@ export default function Login({navigation}) {
 
 
 useEffect(()=>{
+  const voxCheck= async ()=>{
+    try{
+        let state = await Vox.getClientState();
+        console.log("state",state)
+        if (state === Voximplant.ClientState.DISCONNECTED) {
+            await Vox.connect();
+            }
+            else if(state === Voximplant.ClientState.LOGGED_IN ){
+                redirectHome()
+            }
+
+    } catch(e){
+        Alert.alert(e.name + " "+e.message)
+    }
+}
+
     voxCheck()
 },[])
 
-    const voxCheck= async ()=>{
-        try{
-            let state = await Vox.getClientState();
-            console.log("state",state)
-            if (state === Voximplant.ClientState.DISCONNECTED) {
-                await Vox.connect();
-                }
-                else if(state === Voximplant.ClientState.LOGGED_IN ){
-                    redirectHome()
-                }
-
-        } catch(e){
-            Alert.alert(e.name + " "+e.message)
-        }
-    }
     
 
 
     const handleLogin = async() => {
         try{
             let authResult = await Vox.login(VoxuserName, password);
+            console.log("auth result--",authResult.displayName)
             redirectHome();
         }catch(e){
             Alert.alert(e.code + " "+e.message)

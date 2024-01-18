@@ -2,16 +2,19 @@ import { StyleSheet, Text, TextInput, View,  } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import ContactList from '../Components/ContactList'
 import dataContext from '../../Context/dataContext'
+import {Voximplant} from 'react-native-voximplant';
 
 const ContactScreen = ({navigation}) => {
     const {contacts}=useContext(dataContext);
     const [search,setSearch]=useState('')
 
     const[mainContacts,setMainContacts]=useState(contacts)
+    const Vox=Voximplant.getInstance();
 
     const handleSearch=()=>{
         let filtered=contacts.filter((item)=>{
-        if( item.user_display_name[0]?.toLowerCase()==search[0]?.toLowerCase() && (item.user_display_name.toLowerCase().includes(search.toLowerCase()) )){
+        if( item.user_display_name[0]?.toLowerCase()==search[0]?.toLowerCase() && 
+        (item.user_display_name.toLowerCase().includes(search.toLowerCase()) )){
             return true
         }})
         setMainContacts(filtered);
@@ -21,6 +24,22 @@ const ContactScreen = ({navigation}) => {
         navigation.navigate("CallingScreen",{user:item})
 
     }
+
+    
+
+
+    useEffect(()=>{
+      Vox.on(Voximplant.ClientEvents.IncomingCall, ()=>{
+        navigation.navigate('IncomingCallScreen')
+  
+      } )
+
+      return ()=>{
+        Vox.off(Voximplant.ClientEvents.IncomingCall)
+      }
+  
+  
+    },[])
 
 
     useEffect(()=>{

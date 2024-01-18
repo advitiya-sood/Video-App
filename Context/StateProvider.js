@@ -8,9 +8,13 @@ function StateProvider  (props) {
 
 
 const [contacts,setContacts]=useState(Contacts);
+const [LoggedInUser,setLoggedInUser]=useState();
+// console.log("Contacts---IN COntext",contacts)
+
+
 
   return (
-    <dataContext.Provider  value={{contacts}} >
+    <dataContext.Provider  value={{contacts,setContacts}} >
       {props.children}
     </dataContext.Provider>
   )
