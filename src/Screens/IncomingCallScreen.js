@@ -1,20 +1,39 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native'
-import React from 'react'
+import React, {useEffect,useState} from 'react'
 import AntDesign from "react-native-vector-icons/AntDesign"
 import Entypo from "react-native-vector-icons/Entypo"
-
+import { useNavigation, useRoute } from '@react-navigation/native'
+import {Voximplant} from 'react-native-voximplant';
 
 const IncomingCallScreen = () => {
 
+const [caller,setCaller]=useState('')
+
+  const route=useRoute();
+  const navigation= useNavigation()
+  const Vox=Voximplant.getInstance();
+  const{incomingCallEvent}=route.params;    //we get it from the conctas screen when  we receieve the call event  
 
 
+let call= incomingCallEvent.call;
+ 
+useEffect(() => {         
+  setCaller(call.getEndpoints()[0].displayName)
+                                                                
+  call.on(Voximplant.CallEvents.Disconnected,()=>{          // if the caller hangsup thats why in useEffect
+    navigation.navigate('ContactScreen')  
+  }) 
+}, [])
 
-const handleDecline=()=>{
-
-}
 
 const handleAccept=()=>{
-
+  navigation.navigate("CallingScreen",{
+    call,
+    isIncomingCall:true
+      })
+}
+const handleDecline=()=>{
+  call.decline()
 }
 
 
@@ -22,7 +41,7 @@ const handleAccept=()=>{
     <View style={Styles.main} >
       
       <View style={Styles.info}>
-        <Text style={{fontSize:28,fontWeight:"500"}} >John Smith</Text>
+        <Text style={{fontSize:28,fontWeight:"500"}} >{caller}</Text>
         <Text style={{fontSize:18,fontWeight:"400"}}>Video...</Text>
       </View>
 
