@@ -16,7 +16,7 @@ import Login from './src/Screens/LogIn';
 
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+  const isDarkMode = useColorScheme() === 'light';
 
  
   

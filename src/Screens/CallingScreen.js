@@ -156,10 +156,6 @@ const CallingScreen = ({navigation}) => {
     },[hasPermissions])
 
 
-    useEffect(()=>{
-        console.log("CHeck video stream id----------------", videoStreamId)
-    },[videoStreamId])
-
   return (
     <View style={Styles.main} >
         <Pressable  onPress={handlePress} style={Styles.BackIcon} >
@@ -173,15 +169,15 @@ const CallingScreen = ({navigation}) => {
         </View>
      
         <Voximplant.VideoView
+            videoStreamId={videoStreamId.remoteVideoStreamId}
+            style={Styles.remoteScreen}
+        />
+
+        <Voximplant.VideoView
             videoStreamId={videoStreamId.localVideoStreamId}
             style={Styles.miniScreen}
         />
 
-        <Voximplant.VideoView
-            videoStreamId={videoStreamId.remoteVideoStreamId}
-            style={Styles.remoteScreen}
-        />
-     
         <CallButtonComponent handleOnTerminate={handleOnTerminate} />
 
     </View>
@@ -215,7 +211,11 @@ const Styles=StyleSheet.create({
         backgroundColor:"#F2FAFF",
         borderRadius:12,
         position:"absolute",
-        bottom:100
+        left:0,
+        top:0,
+        right:0,
+        zIndex:1,
+        bottom:0
     },
     BackIcon:{
         position:"absolute",

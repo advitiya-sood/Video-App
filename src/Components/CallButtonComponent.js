@@ -56,7 +56,8 @@ const Styles=StyleSheet.create({
         paddingBottom:12,
         justifyContent:"space-between",
         borderTopEndRadius:18,
-        borderTopLeftRadius:18   
+        borderTopLeftRadius:18,
+        zIndex:99
     },
     ButtonStyle:{
         backgroundColor:"#AAB7B8",

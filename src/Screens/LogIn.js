@@ -20,6 +20,15 @@ export default function Login({navigation}) {
     let VoxuserName=`${username}@${"p2p-video"}.${"advitiya-sood"}.voximplant.com`
 
 
+    const storeToken= async (user)=> {
+      try {
+         await AsyncStorage.setItem("tokenData", JSON.stringify(user));
+      } catch (error) {
+        console.log("Something went wrong", error);
+      }
+    }
+
+
 useEffect(()=>{
   const voxCheck= async ()=>{
     try{
@@ -46,7 +55,7 @@ useEffect(()=>{
     const handleLogin = async() => {
         try{
             let authResult = await Vox.login(VoxuserName, password);
-            console.log("auth result--",authResult.displayName)
+            console.log("auth result--",authResult)
             redirectHome();
         }catch(e){
             Alert.alert(e.code + " "+e.message)
@@ -170,6 +179,6 @@ const Styles=StyleSheet.create({
         fontWeight:"500", 
         padding:10,
         width:"100%",
-        marginHorizontal:85,
+        marginHorizontal:'20%',
     },
 })
