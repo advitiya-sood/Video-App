@@ -12,6 +12,10 @@ const CallingScreen = ({navigation}) => {
     const [hasPermissions,setHasPermission]=useState(false)
     const Vox=Voximplant.getInstance();
     const [callState, setCallState]=useState('Initializing....')
+    const [videoStreamId, setVideoStreamId]=useState({
+        localVideoStreamId: null,
+        remoteVideoStreamId: null
+    })
 
     const route=useRoute()
     const {call:incomingCall,isIncomingCall}=route.params                 // when redirecting from incoming call screen(receivening) // same call event but diffrent name
@@ -22,7 +26,19 @@ const CallingScreen = ({navigation}) => {
     let call = useRef(incomingCall);                        // to prevent call from rerendering every time the component is rerendered
                                                             // incoming call default value for receiveing the call will beb undefined in case we start the call
 
+    let endpoint = useRef(null);
 
+    const permissions=[
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+    ]
+
+    const callSettings = {
+        video: {
+        sendVideo: true,
+        receiveVideo: true,
+        },
+    };
 
 
     const handleCallFailed=(event)=>{
@@ -35,14 +51,15 @@ const CallingScreen = ({navigation}) => {
         }])
     }
 
+
+    const handleOnTerminate=()=>{
+        call.current.hangup()
+    }
+
     const handlePress=()=>{
         navigation.goBack()
     }
 
-    const permissions=[
-        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-    ]
 
     useEffect(()=>{                                              // grab necessory permissions 
         const checkPermission=async()=>{
@@ -74,14 +91,7 @@ const CallingScreen = ({navigation}) => {
             return;
         }
 
-        const callSettings = {
-            video: {
-            sendVideo: true,
-            receiveVideo: true,
-            },
-        };
-
-
+        // noraml call events
     const subscribeToEvents=()=>{
         call.current.on(Voximplant.CallEvents.Failed, handleCallFailed)   //subscribe to event
         call.current.on(Voximplant.CallEvents.ProgressToneStart, ()=>setCallState("Ringing...")) 
@@ -90,9 +100,29 @@ const CallingScreen = ({navigation}) => {
             setCallState("Disconnected")
             navigation.navigate('ContactScreen')
         }) 
+        call.current.on(Voximplant.CallEvents.LocalVideoStreamAdded,(event)=>{
+            setVideoStreamId((prev)=>({...prev,"localVideoStreamId":event.videoStream.id}));
+        })
+        call.current.on(Voximplant.CallEvents.EndpointAdded,(event)=>{
+            endpoint.current= event.endpoint
+            subscribeToEndpointEvents()
+        })
 
     }
 
+    // subscribing to endpoint event
+    const subscribeToEndpointEvents=()=>{
+        endpoint.current.on(Voximplant.EndpointEvents.RemoteVideoStreamAdded,(event)=>{
+            setVideoStreamId((prev)=>({...prev,"remoteVideoStreamId":event.videoStream.id}))
+            
+        })
+
+    }
+
+  
+
+
+    // only one of the scenario will run one one device so code accordingly.
     const makeCall= async()=>{
         call.current = await Vox.call(User.user_name,callSettings)
         subscribeToEvents() 
@@ -101,6 +131,10 @@ const CallingScreen = ({navigation}) => {
     const answerCall=()=>{
         call.current.answer(callSettings)
         subscribeToEvents()
+
+        // for the case that receieve the call  endpoint is already added so will have to the event on ans call
+        endpoint.current=call.current.getEndpoints()[0];                 
+        subscribeToEndpointEvents()
     }
 
 
@@ -110,18 +144,21 @@ const CallingScreen = ({navigation}) => {
         makeCall()
     }
 
-        
+        // closing the events
     return ()=>{
         call.current.off(Voximplant.CallEvents.Failed)
         call.current.off(Voximplant.CallEvents.ProgressToneStart)
         call.current.off(Voximplant.CallEvents.Connected)
         call.current.off(Voximplant.CallEvents.Disconnected)
+        call.current.off(Voximplant.EndpointEvents.RemoteVideoStreamAdded)
+        call.current.off(Voximplant.CallEvents.EndpointAdded)
     }
     },[hasPermissions])
 
-    const handleOnTerminate=()=>{
-        call.current.hangup()
-    }
+
+    useEffect(()=>{
+        console.log("CHeck video stream id----------------", videoStreamId)
+    },[videoStreamId])
 
   return (
     <View style={Styles.main} >
@@ -134,10 +171,17 @@ const CallingScreen = ({navigation}) => {
       <Text style={{fontSize:28,fontWeight:"500"}} >{displayName}</Text>
       <Text style={{fontSize:18,fontWeight:"400"}}>{callState}</Text>
         </View>
-        <View style={Styles.miniScreen}>
+     
+        <Voximplant.VideoView
+            videoStreamId={videoStreamId.localVideoStreamId}
+            style={Styles.miniScreen}
+        />
 
-        </View>
-
+        <Voximplant.VideoView
+            videoStreamId={videoStreamId.remoteVideoStreamId}
+            style={Styles.remoteScreen}
+        />
+     
         <CallButtonComponent handleOnTerminate={handleOnTerminate} />
 
     </View>
@@ -162,13 +206,21 @@ const Styles=StyleSheet.create({
         backgroundColor:"pink",
         borderRadius:12,
         position:"absolute",
+        zIndex:99,
         right:10,
+    },
+    remoteScreen:{
+        width:'100%',
+        height:"100%",
+        backgroundColor:"#F2FAFF",
+        borderRadius:12,
+        position:"absolute",
+        bottom:100
     },
     BackIcon:{
         position:"absolute",
         top:25,
         left:10
-        
     }
 
 })
